@@ -114,61 +114,6 @@ function App() {
     }
   };
 
-
-// const generateImages = async () => {
-//   if (!prompt) return;
-//   setIsLoading(true);
-//   setImages([]);
-  
-//   try {
-//     let finalPrompt = prompt;
-//     if (referenceImage) {
-//       const response = await fetch(API_URL, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           messages: [
-//             { role: "system", content: "You are a computer vision expert." },
-//             {
-//               role: "user",
-//               content: [
-//                 { type: "text", text: "Describe this image's style and key elements briefly:" },
-//                 { type: "image_url", image_url: { url: referenceImage } },
-//               ],
-//             },
-//           ],
-//           model: "openai",
-//         }),
-//       });
-//       const imageDescription = await response.text();
-//       finalPrompt = `${prompt}, similar to: ${imageDescription}`;
-//     }
-
-//     const imagePromises = Array.from({ length: imageCount }, async () => {
-//       const seed = Math.floor(Math.random() * 1000000);
-//       const encodedPrompt = encodeURIComponent(finalPrompt);
-//       const imageUrl = `${IMAGE_API_URL}${encodedPrompt}?nologo=true&seed=${seed}&model=${model}`;
-      
-//       // Wait for image to load
-//       const img = new Image();
-//       await new Promise((resolve, reject) => {
-//         img.onload = resolve;
-//         img.onerror = reject;
-//         img.src = imageUrl;
-//       });
-      
-//       return imageUrl;
-//     });
-
-//     const imageUrls = await Promise.all(imagePromises);
-//     setImages(imageUrls);
-//   } catch (error) {
-//     console.error("Error generating images:", error);
-//   } finally {
-//     setIsLoading(false);
-//   }
-// };
-
 const generateImages = async () => {
   if (!prompt) return;
   setIsLoading(true);
@@ -176,8 +121,28 @@ const generateImages = async () => {
   
   try {
     let finalPrompt = prompt;
+    
     if (referenceImage) {
-      const imageDescription = await response.text();
+      // First make the API call to get image description
+      const imageResponse = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            { role: "system", content: "You are a computer vision expert." },
+            {
+              role: "user",
+              content: [
+                { type: "text", text: "Describe this image's style and key elements briefly:" },
+                { type: "image_url", image_url: { url: referenceImage } },
+              ],
+            },
+          ],
+          model: "openai",
+        }),
+      });
+      
+      const imageDescription = await imageResponse.text();
       finalPrompt = `${prompt}, similar to: ${imageDescription}`;
     }
 
@@ -201,7 +166,7 @@ const generateImages = async () => {
         return imageUrl;
       } catch (error) {
         console.error(`Error generating image ${index + 1}:`, error);
-        return null; // Return null for failed images
+        return null;
       }
     });
 
