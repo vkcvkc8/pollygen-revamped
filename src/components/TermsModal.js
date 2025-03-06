@@ -19,7 +19,7 @@ function TermsModal({ onAccept }) {
     <div id="termsModal" className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center">
       <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/10 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 text-transparent bg-clip-text">
-          Welcome to PollyGen Revamped
+          Welcome to ZEN AI
         </h2>
 
         {/* Usage Instructions */}
@@ -113,17 +113,21 @@ function TermsModal({ onAccept }) {
         {/* Agreement Checkbox */}
         <div className="flex items-center justify-center gap-3 mb-6 py-2">
           <div className="flex items-center">
-            <div className="custom-checkbox">
+            <div className="custom-checkbox relative">
               <input
                 type="checkbox"
                 id="termsCheckbox"
-                className="hidden"
                 checked={checkboxChecked}
                 onChange={(e) => setCheckboxChecked(e.target.checked)}
+                className="absolute opacity-0 w-full h-full cursor-pointer"
               />
-              <label htmlFor="termsCheckbox" className="custom-checkbox-label"></label>
+              <label 
+                htmlFor="termsCheckbox" 
+                className="custom-checkbox-label"
+                aria-label="Accept terms and conditions"
+              ></label>
             </div>
-            <label htmlFor="termsCheckbox" className="text-sm ml-3">
+            <label htmlFor="termsCheckbox" className="text-sm ml-3 cursor-pointer select-none">
               I have read and agree to the usage guidelines, terms & conditions, and remix policy
             </label>
           </div>
@@ -139,7 +143,7 @@ function TermsModal({ onAccept }) {
               : "from-purple-600/50 to-purple-700/50 text-white/50 cursor-not-allowed"
           }`}
         >
-          <span>Continue to PollyGen</span>
+          <span>Continue to ZEN AI</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>

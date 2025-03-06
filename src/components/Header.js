@@ -17,9 +17,9 @@ function Header({ apiStatus }) {
           </div>
           <div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 animate-gradient text-transparent bg-clip-text">
-              PollyGen Revamped
+              ZEN AI
             </h1>
-            <p className="text-xs text-gray-400">Powered by Pollinations AI</p>
+            <p className="text-xs text-gray-400">Made by Vaibhav Chopra</p>
           </div>
         </div>
         <div className="flex items-center gap-2" id="apiStatus">

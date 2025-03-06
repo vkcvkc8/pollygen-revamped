@@ -1,3 +1,4 @@
+import './style.css';
 import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import TermsModal from "./components/TermsModal";
@@ -8,6 +9,7 @@ import ImageResults from "./components/ImageResults";
 import Footer from "./components/Footer";
 const API_URL = "https://text.pollinations.ai/";
 const IMAGE_API_URL = "https://image.pollinations.ai/prompt/";
+
 
 const modelConfigs = {
   flux: { name: "Flux (Default)", strength: 1.0 },
@@ -35,6 +37,8 @@ function App() {
   const [referenceImage, setReferenceImage] = useState(null);
   const [modalImage, setModalImage] = useState(null);
   const [apiStatus, setApiStatus] = useState("Checking APIs...");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     checkApiStatus();
@@ -110,44 +114,105 @@ function App() {
     }
   };
 
-  const generateImages = async () => {
-    if (!prompt) return;
-    setImages([]);
+
+// const generateImages = async () => {
+//   if (!prompt) return;
+//   setIsLoading(true);
+//   setImages([]);
+  
+//   try {
+//     let finalPrompt = prompt;
+//     if (referenceImage) {
+//       const response = await fetch(API_URL, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           messages: [
+//             { role: "system", content: "You are a computer vision expert." },
+//             {
+//               role: "user",
+//               content: [
+//                 { type: "text", text: "Describe this image's style and key elements briefly:" },
+//                 { type: "image_url", image_url: { url: referenceImage } },
+//               ],
+//             },
+//           ],
+//           model: "openai",
+//         }),
+//       });
+//       const imageDescription = await response.text();
+//       finalPrompt = `${prompt}, similar to: ${imageDescription}`;
+//     }
+
+//     const imagePromises = Array.from({ length: imageCount }, async () => {
+//       const seed = Math.floor(Math.random() * 1000000);
+//       const encodedPrompt = encodeURIComponent(finalPrompt);
+//       const imageUrl = `${IMAGE_API_URL}${encodedPrompt}?nologo=true&seed=${seed}&model=${model}`;
+      
+//       // Wait for image to load
+//       const img = new Image();
+//       await new Promise((resolve, reject) => {
+//         img.onload = resolve;
+//         img.onerror = reject;
+//         img.src = imageUrl;
+//       });
+      
+//       return imageUrl;
+//     });
+
+//     const imageUrls = await Promise.all(imagePromises);
+//     setImages(imageUrls);
+//   } catch (error) {
+//     console.error("Error generating images:", error);
+//   } finally {
+//     setIsLoading(false);
+//   }
+// };
+
+const generateImages = async () => {
+  if (!prompt) return;
+  setIsLoading(true);
+  setImages([]); // Clear existing images
+  
+  try {
     let finalPrompt = prompt;
     if (referenceImage) {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            { role: "system", content: "You are a computer vision expert." },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: "Describe this image's style and key elements briefly:" },
-                { type: "image_url", image_url: { url: referenceImage } },
-              ],
-            },
-          ],
-          model: "openai",
-        }),
-      });
       const imageDescription = await response.text();
       finalPrompt = `${prompt}, similar to: ${imageDescription}`;
     }
-    const imagePromises = Array.from({ length: imageCount }, async () => {
-      const seed = Math.floor(Math.random() * 1000000);
-      const encodedPrompt = encodeURIComponent(finalPrompt);
-      const imageUrl = `${IMAGE_API_URL}${encodedPrompt}?nologo=true&seed=${seed}&model=${model}`;
-      return imageUrl;
+
+    // Create array of pending image generations
+    const pendingImages = Array.from({ length: imageCount }, async (_, index) => {
+      try {
+        const seed = Math.floor(Math.random() * 1000000);
+        const encodedPrompt = encodeURIComponent(finalPrompt);
+        const imageUrl = `${IMAGE_API_URL}${encodedPrompt}?nologo=true&seed=${seed}&model=${model}`;
+        
+        // Wait for image to load
+        const img = new Image();
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = imageUrl;
+        });
+        
+        // Add successful image to state immediately
+        setImages(prevImages => [...prevImages, imageUrl]);
+        return imageUrl;
+      } catch (error) {
+        console.error(`Error generating image ${index + 1}:`, error);
+        return null; // Return null for failed images
+      }
     });
-    try {
-      const imageUrls = await Promise.all(imagePromises);
-      setImages(imageUrls);
-    } catch (error) {
-      console.error("Error generating images:", error);
-    }
-  };
+
+    // Wait for all generations to complete
+    await Promise.allSettled(pendingImages);
+  } catch (error) {
+    console.error("Error in image generation:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-purple-900/20 to-black text-white">
@@ -156,19 +221,20 @@ function App() {
       <Header apiStatus={apiStatus} />
       <main className="flex-grow container mx-auto px-4 pt-32 pb-8">
         <div className="max-w-4xl mx-auto space-y-8">
-          <PromptInput
-            prompt={prompt}
-            setPrompt={setPrompt}
-            enhancePrompt={enhancePrompt}
-            generateImages={generateImages}
-            model={model}
-            setModel={setModel}
-            imageCount={imageCount}
-            setImageCount={setImageCount}
-            referenceImage={referenceImage}
-            setReferenceImage={setReferenceImage}
-            presets={presets}
-          />
+            <PromptInput
+              prompt={prompt}
+              setPrompt={setPrompt}
+              enhancePrompt={enhancePrompt}
+              generateImages={generateImages}
+              model={model}
+              setModel={setModel}
+              imageCount={imageCount}
+              setImageCount={setImageCount}
+              referenceImage={referenceImage}
+              setReferenceImage={setReferenceImage}
+              presets={presets}
+              isLoading={isLoading}
+            />
           <ChatHistory chatHistory={chatHistory} />
           <ImageResults images={images} onImageClick={setModalImage} />
         </div>
