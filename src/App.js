@@ -11,11 +11,6 @@ const API_URL = "https://text.pollinations.ai/";
 const IMAGE_API_URL = "https://image.pollinations.ai/prompt/";
 
 
-const modelConfigs = {
-  flux: { name: "Flux (Default)", strength: 1.0 },
-  turbo: { name: "Turbo", strength: 0.9 },
-};
-
 const presets = {
   cinematic: "cinematic shot, dramatic lighting, professional photography, 8k resolution",
   anime: "anime art style, vibrant colors, studio ghibli inspired, detailed illustration",
