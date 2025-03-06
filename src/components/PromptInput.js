@@ -138,7 +138,7 @@ function PromptInput({
                   <div className="flex items-center gap-2">
                     <img
                       src={referenceImage}
-                      alt="Selected image"
+                      alt="Reference"
                       className="w-16 h-16 object-cover rounded-lg cursor-zoom-in hover:scale-105 transition-transform"
                     />
                     <button

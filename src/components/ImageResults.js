@@ -22,7 +22,7 @@ function ImageResults({ images, onImageClick }) {
           )}
           <img
             src={url}
-            alt={`Generated image ${index + 1}`}
+            alt={`Generated result ${index + 1}`}
             className={`generated-image ${loadedImages[url] ? 'loaded' : ''}`}
             onLoad={() => handleImageLoad(url)}
             onClick={() => onImageClick(url)}
